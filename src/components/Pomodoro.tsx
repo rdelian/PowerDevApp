@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CommonTimer from "./CommonTimer";
+import useCommonTimer from "./CommonTimer";
 import { Button } from "./ui/button";
 import { FaPlay, FaStop, FaUndo } from "react-icons/fa";
 
@@ -12,18 +12,34 @@ const Pomodoro = ({ workTimerTarget, pauseTimerTarget }: PomodoroProps) => {
 	const [isWorkingPhase, setIsWorkingPhase] = useState(true);
 	const [points, setPoints] = useState(0);
 
-	const workTimer = CommonTimer({
-		timeTarget: workTimerTarget * 60,
-		onTargetReached: () => setIsWorkingPhase(false),
+	const workTimer = useCommonTimer({
+		timeTarget: workTimerTarget,
+		onTargetReached: workTimerFinished,
 		onTick: () => setPoints(prevPoints => prevPoints + 1)
 	});
 
-	const breakTimer = CommonTimer({
-		timeTarget: pauseTimerTarget * 60,
-		onTargetReached: () => setIsWorkingPhase(true)
+	const breakTimer = useCommonTimer({
+		timeTarget: pauseTimerTarget,
+		onTargetReached: breakTimerFinished
 	});
 
 	const isAnyTimerActive = workTimer.isActive || breakTimer.isActive;
+
+	function workTimerFinished() {
+		setIsWorkingPhase(false);
+		new Notification("Pomodoro Timer", {
+			body: "Time to take a break!",
+			requireInteraction: true
+		});
+	}
+
+	function breakTimerFinished() {
+		setIsWorkingPhase(true);
+		new Notification("Pomodoro Timer", {
+			body: "Time to get back to work!",
+			requireInteraction: true
+		});
+	}
 
 	function togglePomodoro() {
 		if (isWorkingPhase) {
@@ -47,7 +63,7 @@ const Pomodoro = ({ workTimerTarget, pauseTimerTarget }: PomodoroProps) => {
 				<p className="text-sm -mt-2 -mb-2">{isWorkingPhase ? "Work" : "Break"}</p>
 
 				{/* Timer */}
-				<p className="text-4xl py-1">{isWorkingPhase ? workTimer.time : breakTimer.time}</p>
+				<p className="text-4xl py-1">{isWorkingPhase ? workTimer.timeFormated : breakTimer.timeFormated}</p>
 
 				{/* Control buttons */}
 				<div className="flex gap-2 justify-between">

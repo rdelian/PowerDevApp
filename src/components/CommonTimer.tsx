@@ -12,10 +12,12 @@ type CommonTimerProps = {
 	onTick?: () => void;
 };
 
-const CommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset, onTick }: CommonTimerProps) => {
+const useCommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset, onTick }: CommonTimerProps) => {
 	const [time, setTime] = useState(0);
-	const [isActive, setIsActive] = useState(false);
+	const isActive = useRef(false);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+	timeTarget = timeTarget * 60;
 
 	function _clearTimer() {
 		if (intervalRef.current) {
@@ -25,27 +27,31 @@ const CommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset, o
 	}
 
 	function _startTimer() {
-		setIsActive(true);
+		// console.log("Start timer", new Date());
+		isActive.current = true;
 		intervalRef.current = setInterval(() => {
-			setTime(prevTime => prevTime + 20);
-			console.log("Tick", new Date());
+			setTime(prevTime => prevTime + 1);
+			// console.log("Tick", new Date());
 		}, 1000);
 		onStart?.();
 	}
 
 	function _pauseTimer() {
-		setIsActive(false);
+		// console.log("Pause timer", new Date());
+		isActive.current = false;
 		_clearTimer();
 		onPause?.();
 	}
-
+	
 	function toggleTimer() {
-		isActive ? _pauseTimer() : _startTimer();
+		// console.log("Toggle timer", new Date());
+		isActive.current ? _pauseTimer() : _startTimer();
 	}
 
 	function resetTimer() {
+		// console.log("Reset timer", new Date());
 		setTime(0);
-		setIsActive(false);
+		isActive.current = false;
 		_clearTimer();
 		onReset?.();
 	}
@@ -53,14 +59,23 @@ const CommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset, o
 	useEffect(() => {
 		onTick?.();
 
+		// console.log("Timer tick", time, timeTarget, isActive);
+
 		if (time < timeTarget) return;
 
-		console.log("Target reached", new Date());
+		// console.log("[1] Target reached", new Date());
 		resetTimer();
 		onTargetReached?.();
+		// console.log("[2] Target reached end", isActive);
 	}, [time, timeTarget]);
 
-	return { time: formatTime(timeTarget - time), isActive, toggleTimer, resetTimer };
+	return {
+		timeFormated: formatTime(timeTarget - time),
+		timeElapsed: time,
+		isActive: isActive.current,
+		toggleTimer,
+		resetTimer
+	};
 };
 
-export default CommonTimer;
+export default useCommonTimer;
