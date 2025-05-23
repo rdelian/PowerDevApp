@@ -72,11 +72,11 @@ const Pomodoro = ({ workTimerTarget, pauseTimerTarget, setPoints }: PomodoroProp
 				<p className="text-4xl py-1">{isWorkingPhase ? workTimer.timeFormated : breakTimer.timeFormated}</p>
 
 				{/* Control buttons */}
-				<div className="flex gap-2 justify-between">
-					<Button size="sm" onClick={togglePomodoro}>
+				<div className="flex gap-2 justify-center">
+					<Button onClick={togglePomodoro}>
 						{isAnyTimerActive() ? <FaStop /> : <FaPlay />}
 					</Button>
-					<Button size="sm" onClick={resetPomodoro}>
+					<Button onClick={resetPomodoro}>
 						<FaUndo />
 					</Button>
 				</div>

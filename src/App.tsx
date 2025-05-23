@@ -1,5 +1,6 @@
 import "./App.css";
 import Pomodoro from "./components/Pomodoro";
+import { RandomTask } from "./components/RandomTask";
 import TwentyTwenty from "./components/TwentyTwenty";
 import { Button } from "./components/ui/button";
 import { handleRequestNotificationPermission } from "./lib/common";
@@ -25,6 +26,7 @@ function App() {
 				<div className="flex flex-col gap-4 p-4">
 					<Pomodoro workTimerTarget={60} pauseTimerTarget={3} setPoints={setPoints} />
 					<TwentyTwenty setPoints={setPoints} />
+					<RandomTask />
 				</div>
 			</div>
 		</>
