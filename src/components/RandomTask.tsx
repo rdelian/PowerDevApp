@@ -5,6 +5,8 @@ import { Alert, AlertDescription } from "./ui/alert";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { useLocalStorage } from "../lib/useLocalStorage";
+import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "./ui/separator";
 
 // type RandomTaskProps = {};
 
@@ -31,13 +33,11 @@ export const RandomTask = () => {
 		const randomTask = tasksList[randomIndex];
 
 		setSelectedTask(randomTask);
-		setTasksList(tasksList.filter((_, index) => index !== randomIndex));
+		removeTask(randomTask);
 	};
 
 	const handleKeyPress = (e: React.KeyboardEvent) => {
-		if (e.key === "Enter") {
-			addTask();
-		}
+		if (e.key === "Enter") addTask();
 	};
 
 	return (
@@ -62,14 +62,18 @@ export const RandomTask = () => {
 			{/* Tasks list */}
 			{tasksList.length > 0 && (
 				<div className="space-y-2">
-					<h3 className="text-lg font-semibold">Tasks ({tasksList.length})</h3>
 					<div className="space-y-2">
-						{tasksList.map((task, index) => (
-							<div key={index} className="flex items-center justify-between pl-2 rounded-md border">
-								<span className="flex-1">{task}</span>
-								<FaXmark onClick={() => removeTask(task)} className="hover:text-destructive" />
-							</div>
-						))}
+						<ScrollArea className="h-[200px] w-[350px] rounded-md pr border-2">
+							{tasksList.map((task, index) => (
+								<>
+									<div key={index} className="flex items-center justify-between m-1 rounded-md ">
+										<span className="flex-1">{task}</span>
+										<FaXmark onClick={() => removeTask(task)} className="hover:text-destructive mr-2" />
+									</div>
+									<Separator className="" />
+								</>
+							))}
+						</ScrollArea>
 					</div>
 				</div>
 			)}
@@ -77,20 +81,13 @@ export const RandomTask = () => {
 			{/* Random selection button */}
 			{tasksList.length > 0 && (
 				<Button onClick={selectRandomTask} className="w-full" size="lg">
-					Pick Random
+					{`Pick Random (${tasksList.length})`}
 				</Button>
-			)}
-
-			{/* Empty state */}
-			{tasksList.length === 0 && !selectedTask && (
-				<div className="text-center py-8 text-muted-foreground">
-					<p>No tasks yet. Add some tasks to get started!</p>
-				</div>
 			)}
 
 			{/* Selected task alert */}
 			{selectedTask && (
-				<Alert className="border-green-500 bg-green-50 dark:bg-green-950">
+				<Alert className="border-green-500 bg-green-50 dark:bg-green-950 w-[350px]">
 					<AlertDescription className="font-medium text-green-800 dark:text-green-200">
 						<span>
 							🎯 Your task: <strong>{selectedTask}</strong>
