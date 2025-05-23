@@ -3,11 +3,13 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Alert, AlertDescription } from "./ui/alert";
 import { FaPlus } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
+import { useLocalStorage } from "../lib/useLocalStorage";
 
 // type RandomTaskProps = {};
 
 export const RandomTask = () => {
-	const [tasksList, setTasksList] = useState<string[]>([]);
+	const [tasksList, setTasksList] = useLocalStorage<string[]>("randomTasks", []);
 	const [newTask, setNewTask] = useState("");
 	const [selectedTask, setSelectedTask] = useState<string | null>(null);
 
@@ -63,11 +65,9 @@ export const RandomTask = () => {
 					<h3 className="text-lg font-semibold">Tasks ({tasksList.length})</h3>
 					<div className="space-y-2">
 						{tasksList.map((task, index) => (
-							<div key={index} className="flex items-center justify-between p-3 bg-card rounded-lg border">
+							<div key={index} className="flex items-center justify-between pl-2 rounded-md border">
 								<span className="flex-1">{task}</span>
-								<Button variant="destructive" size="sm" onClick={() => removeTask(task)} className="ml-2">
-									×
-								</Button>
+								<FaXmark onClick={() => removeTask(task)} className="hover:text-destructive" />
 							</div>
 						))}
 					</div>
@@ -75,9 +75,11 @@ export const RandomTask = () => {
 			)}
 
 			{/* Random selection button */}
-			<Button onClick={selectRandomTask} disabled={tasksList.length === 0} className="w-full" size="lg">
-				{tasksList.length === 0 ? "No tasks available" : `Pick Random Task (${tasksList.length} available)`}
-			</Button>
+			{tasksList.length > 0 && (
+				<Button onClick={selectRandomTask} className="w-full" size="lg">
+					Pick Random
+				</Button>
+			)}
 
 			{/* Empty state */}
 			{tasksList.length === 0 && !selectedTask && (
@@ -90,7 +92,9 @@ export const RandomTask = () => {
 			{selectedTask && (
 				<Alert className="border-green-500 bg-green-50 dark:bg-green-950">
 					<AlertDescription className="font-medium text-green-800 dark:text-green-200">
-						<span>🎯 Your task: <strong>{selectedTask}</strong></span>
+						<span>
+							🎯 Your task: <strong>{selectedTask}</strong>
+						</span>
 					</AlertDescription>
 				</Alert>
 			)}
