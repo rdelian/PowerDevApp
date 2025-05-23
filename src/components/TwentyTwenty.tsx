@@ -2,14 +2,17 @@
 import { FaPlay, FaStop } from "react-icons/fa";
 import useCommonTimer from "./CommonTimer";
 import { Button } from "./ui/button";
+import config from "@/config";
+import { useState } from "react";
 
 type TwentyTwentyProps = {
 	setPoints: (value: number | ((val: number) => number)) => void;
 };
 
 const TwentyTwenty = ({ setPoints }: TwentyTwentyProps) => {
+	const [isFinalPhase, setIsFinalPhase] = useState(false);
 	const twentyTimer = useCommonTimer({
-		timeTarget: .1,
+		timeTarget: 20,
 		onTargetReached: handleTargetReached
 	});
 
@@ -20,15 +23,15 @@ const TwentyTwenty = ({ setPoints }: TwentyTwentyProps) => {
 		});
 
 		interactNotif.onclose = () => {
-			console.log("Notification closed");
+			setIsFinalPhase(true);
 			setTimeout(() => {
 				twentyTimer.toggleTimer();
 				new Notification("The 20/20 Rules", {
 					body: "You can look back at the screen now"
 				});
-				// 20 minutes of 12 points/sec
-				setPoints(prevPoints => prevPoints + 14400);
-			}, 3000);
+				setPoints(prevPoints => prevPoints + config.pomodoro.pointsPerSecond * 60 * 20);
+				setIsFinalPhase(false);
+			}, 20000);
 		};
 	}
 
@@ -47,7 +50,9 @@ const TwentyTwenty = ({ setPoints }: TwentyTwentyProps) => {
 
 				{/* Control buttons */}
 				<div className="">
-					<Button onClick={toggleTwentyTimer}>{twentyTimer.isActive ? <FaStop /> : <FaPlay />}</Button>
+					<Button disabled={isFinalPhase} onClick={toggleTwentyTimer}>
+						{twentyTimer.isActive ? <FaStop /> : <FaPlay />}
+					</Button>
 				</div>
 			</div>
 		</>

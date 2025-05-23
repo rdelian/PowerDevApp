@@ -7,6 +7,7 @@ import { useLocalStorage } from "./lib/useLocalStorage";
 
 function App() {
 	const [points, setPoints] = useLocalStorage<number>("points", 0);
+	const shouldAskForNotificationPermission = Notification?.permission !== "granted";
 
 	return (
 		<>
@@ -16,9 +17,11 @@ function App() {
 					<span className="text-2xl pl-1"> 🍪</span>
 					{/* <span className="text-xs pl-1">{(points / 3600 / 24)}hrs</span> */}
 				</div>
-				{Notification && Notification.permission !== "granted" ? (
+
+				{shouldAskForNotificationPermission && (
 					<Button onClick={handleRequestNotificationPermission}>Enable Notifications</Button>
-				) : null}
+				)}
+
 				<div className="flex flex-col gap-4 p-4">
 					<Pomodoro workTimerTarget={60} pauseTimerTarget={3} setPoints={setPoints} />
 					<TwentyTwenty setPoints={setPoints} />

@@ -2,6 +2,7 @@ import { useState } from "react";
 import useCommonTimer from "./CommonTimer";
 import { Button } from "./ui/button";
 import { FaPlay, FaStop, FaUndo } from "react-icons/fa";
+import config from "@/config";
 
 type PomodoroProps = {
 	workTimerTarget: number;
@@ -17,7 +18,7 @@ const Pomodoro = ({ workTimerTarget, pauseTimerTarget, setPoints }: PomodoroProp
 		onTargetReached: workTimerFinished,
 		onTick: () => {
 			if (!workTimer.isActive) return;
-			setPoints(prevPoints => prevPoints + 12);
+			setPoints(prevPoints => prevPoints + config.pomodoro.pointsPerSecond);
 		}
 	});
 
