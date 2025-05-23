@@ -14,12 +14,12 @@ type CommonTimerProps = {
 
 const useCommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset, onTick }: CommonTimerProps) => {
 	const [time, setTime] = useState(0);
-	const isActive = useRef(false);
+	const [isActive, setIsActive] = useState(false);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
 	timeTarget = timeTarget * 60;
 
-	function _clearTimer() {
+	function _clearInterval() {
 		if (intervalRef.current) {
 			clearInterval(intervalRef.current);
 			intervalRef.current = null;
@@ -28,31 +28,32 @@ const useCommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset
 
 	function _startTimer() {
 		// console.log("Start timer", new Date());
-		isActive.current = true;
+		setIsActive(true);
 		intervalRef.current = setInterval(() => {
 			setTime(prevTime => prevTime + 1);
 			// console.log("Tick", new Date());
 		}, 1000);
+
 		onStart?.();
 	}
 
 	function _pauseTimer() {
 		// console.log("Pause timer", new Date());
-		isActive.current = false;
-		_clearTimer();
+		setIsActive(false);
+		_clearInterval();
 		onPause?.();
 	}
-	
+
 	function toggleTimer() {
-		// console.log("Toggle timer", new Date());
-		isActive.current ? _pauseTimer() : _startTimer();
+		console.log("Toggle timer", isActive, new Date());
+		isActive ? _pauseTimer() : _startTimer();
 	}
 
 	function resetTimer() {
 		// console.log("Reset timer", new Date());
 		setTime(0);
-		isActive.current = false;
-		_clearTimer();
+		setIsActive(false);
+		_clearInterval();
 		onReset?.();
 	}
 
@@ -72,7 +73,7 @@ const useCommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset
 	return {
 		timeFormated: formatTime(timeTarget - time),
 		timeElapsed: time,
-		isActive: isActive.current,
+		isActive: isActive,
 		toggleTimer,
 		resetTimer
 	};

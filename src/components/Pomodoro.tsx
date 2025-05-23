@@ -6,16 +6,19 @@ import { FaPlay, FaStop, FaUndo } from "react-icons/fa";
 type PomodoroProps = {
 	workTimerTarget: number;
 	pauseTimerTarget: number;
+	setPoints: (value: number | ((val: number) => number)) => void;
 };
 
-const Pomodoro = ({ workTimerTarget, pauseTimerTarget }: PomodoroProps) => {
+const Pomodoro = ({ workTimerTarget, pauseTimerTarget, setPoints }: PomodoroProps) => {
 	const [isWorkingPhase, setIsWorkingPhase] = useState(true);
-	const [points, setPoints] = useState(0);
 
 	const workTimer = useCommonTimer({
 		timeTarget: workTimerTarget,
 		onTargetReached: workTimerFinished,
-		onTick: () => setPoints(prevPoints => prevPoints + 1)
+		onTick: () => {
+			if (!workTimer.isActive) return;
+			setPoints(prevPoints => prevPoints + 12);
+		}
 	});
 
 	const breakTimer = useCommonTimer({
@@ -23,7 +26,9 @@ const Pomodoro = ({ workTimerTarget, pauseTimerTarget }: PomodoroProps) => {
 		onTargetReached: breakTimerFinished
 	});
 
-	const isAnyTimerActive = workTimer.isActive || breakTimer.isActive;
+	function isAnyTimerActive() {
+		return workTimer.isActive || breakTimer.isActive;
+	}
 
 	function workTimerFinished() {
 		setIsWorkingPhase(false);
@@ -57,7 +62,7 @@ const Pomodoro = ({ workTimerTarget, pauseTimerTarget }: PomodoroProps) => {
 
 	return (
 		<>
-			<p>Points: {points}</p>
+			{/* <p>Points: {points}</p> */}
 			<div className="border-2 p-2 rounded-md">
 				{/* Title */}
 				<p className="text-sm -mt-2 -mb-2">{isWorkingPhase ? "Work" : "Break"}</p>
@@ -68,7 +73,7 @@ const Pomodoro = ({ workTimerTarget, pauseTimerTarget }: PomodoroProps) => {
 				{/* Control buttons */}
 				<div className="flex gap-2 justify-between">
 					<Button size="sm" onClick={togglePomodoro}>
-						{isAnyTimerActive ? <FaStop /> : <FaPlay />}
+						{isAnyTimerActive() ? <FaStop /> : <FaPlay />}
 					</Button>
 					<Button size="sm" onClick={resetPomodoro}>
 						<FaUndo />

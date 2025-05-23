@@ -3,27 +3,34 @@ import { FaPlay, FaStop } from "react-icons/fa";
 import useCommonTimer from "./CommonTimer";
 import { Button } from "./ui/button";
 
-const TwentyTwenty = () => {
-	const twentyTimer = useCommonTimer({
-		timeTarget: 20,
-		onTargetReached: () => {
-			const notif = new Notification("The 20/20 Rules", {
-				body: "Look away from the screen for 20 seconds.\nYou will be notified when you can look back at the screen",
-				requireInteraction: true
-			});
+type TwentyTwentyProps = {
+	setPoints: (value: number | ((val: number) => number)) => void;
+};
 
-			notif.onclose = () => {
-				console.log("Notification closed");
-				setTimeout(() =>{
-					twentyTimer.toggleTimer();
-					new Notification("The 20/20 Rules", {
-						body: "You can look back at the screen now",
-						requireInteraction: true
-					});
-				}, 20000);
-			};
-		}
+const TwentyTwenty = ({ setPoints }: TwentyTwentyProps) => {
+	const twentyTimer = useCommonTimer({
+		timeTarget: .1,
+		onTargetReached: handleTargetReached
 	});
+
+	function handleTargetReached() {
+		const interactNotif = new Notification("The 20/20 Rules", {
+			body: "Look away from the screen for 20 seconds.\nYou will be notified when you can look back at the screen",
+			requireInteraction: true
+		});
+
+		interactNotif.onclose = () => {
+			console.log("Notification closed");
+			setTimeout(() => {
+				twentyTimer.toggleTimer();
+				new Notification("The 20/20 Rules", {
+					body: "You can look back at the screen now"
+				});
+				// 20 minutes of 12 points/sec
+				setPoints(prevPoints => prevPoints + 14400);
+			}, 3000);
+		};
+	}
 
 	function toggleTwentyTimer() {
 		twentyTimer.isActive ? twentyTimer.resetTimer() : twentyTimer.toggleTimer();
