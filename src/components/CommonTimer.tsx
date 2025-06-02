@@ -17,6 +17,7 @@ const useCommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset
 	const [_isActive, setIsActive] = useState(false);
 	const _intervalRef = useRef<NodeJS.Timeout | null>(null);
 	const isActiveRef = useRef(false);
+	const startTimeRef = useRef<number | null>(null);
 
 	timeTarget = timeTarget * 60;
 
@@ -30,9 +31,15 @@ const useCommonTimer = ({ timeTarget, onTargetReached, onStart, onPause, onReset
 	function _startTimer() {
 		setIsActive(true);
 		isActiveRef.current = true;
+		startTimeRef.current = new Date().getTime() - (time * 1000);
+		
 		_intervalRef.current = setInterval(() => {
-			setTime(prevTime => prevTime + 1);
-		}, 1000);
+			if (startTimeRef.current) {
+				const currentTime = new Date().getTime();
+				const elapsedSeconds = Math.floor((currentTime - startTimeRef.current) / 1000);
+				setTime(elapsedSeconds);
+			}
+		}, 500);
 
 		onStart?.();
 	}
